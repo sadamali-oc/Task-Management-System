@@ -79,7 +79,7 @@ const CreateTaskForm = () => {
         </form>
       </BasicCard>
 
-      <TaskTable tasks={tasks} />
+   
     </div>
   );
 };

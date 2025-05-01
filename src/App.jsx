@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React  from "react";
 // import { Routes, Route } from "react-router-dom";
 // import DashboardPage from "./pages/DashboardPage";
 // import TasksPage from "./pages/taskPage";
@@ -17,31 +17,31 @@ const App = () => {
   //   email: "john.doe@example.com",
   //   role: "client",
   // };
-  const [tasks, setTasks] = useState([
-    {
-      taskName: "Finish Documentation",
-      description: "Complete the user manual and API docs.",
-      status: "processing",
-    },
-    {
-      taskName: "Design Homepage",
-      description: "Design the layout and structure of the homepage.",
-      status: "completed",
-    },
-    {
-      taskName: "Fix Bugs in Login",
-      description: "Resolve the issues with the login form validation.",
-      status: "unread",
-    },
+  // const [tasks, setTasks] = useState([
+  //   {
+  //     taskName: "Finish Documentation",
+  //     description: "Complete the user manual and API docs.",
+  //     status: "processing",
+  //   },
+  //   {
+  //     taskName: "Design Homepage",
+  //     description: "Design the layout and structure of the homepage.",
+  //     status: "completed",
+  //   },
+  //   {
+  //     taskName: "Fix Bugs in Login",
+  //     description: "Resolve the issues with the login form validation.",
+  //     status: "unread",
+  //   },
 
-  ]);
+  // ]);
 
 
-  const handleStatusChange = (index, newStatus) => {
-    const updatedTasks = [...tasks];
-    updatedTasks[index].status = newStatus;
-    setTasks(updatedTasks);
-  };
+  // const handleStatusChange = (index, newStatus) => {
+  //   const updatedTasks = [...tasks];
+  //   updatedTasks[index].status = newStatus;
+  //   setTasks(updatedTasks);
+  // };
 
 
   return (
@@ -57,15 +57,14 @@ const App = () => {
 
       {/* <TaskTable/> */}
 
-      <ClientTaskTable tasks={tasks} />
 
-      <DeveloperTaskTable tasks={tasks} onStatusChange={handleStatusChange} />
+      {/* <DeveloperTaskTable tasks={tasks} onStatusChange={handleStatusChange} /> */}
 
 
       
 
       {/* < TaskCard /> */}
-      {/* <AppRoutes /> */}
+      <AppRoutes />
     </div>
   );
 };

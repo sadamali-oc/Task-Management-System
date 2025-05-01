@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Drawer, List, Toolbar, Box, Divider } from "@mui/material";
 import NavigationItem from "../../molecules/navItem"; // Assuming NavigationItem exists
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -7,7 +7,6 @@ import PeopleIcon from "@mui/icons-material/People";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import TaskIcon from "@mui/icons-material/Task";
 import RemoveCircleOutline from "@mui/icons-material/RemoveCircleOutline";
-// import useAuthStore from "../../../store/useAuthStore";
 import ListIcon from '@mui/icons-material/List';
 
 const drawerWidth = 240;
@@ -37,7 +36,6 @@ const navItems = [
     path: "/tasks",
     roles: ["admin", "client"],
   },
-
   {
     label: "Assigned Tasks",
     icon: <ListAltIcon />,
@@ -62,13 +60,18 @@ const logoutItem = [
 ];
 
 export default function Sidebar() {
-  const role = "client"
+  const [activeTab, setActiveTab] = useState("/"); // State to store active tab's path
+  const role = "client";
 
   const handleLogout = () => {
     localStorage.removeItem("userToken");
     sessionStorage.removeItem("userToken");
     console.log("Logging out...");
-    window.location.href = "/login"; 
+    window.location.href = "/login";
+  };
+
+  const handleTabClick = (path) => {
+    setActiveTab(path); // Set active tab when a navigation item is clicked
   };
 
   return (
@@ -91,6 +94,14 @@ export default function Sidebar() {
                 icon={item.icon}
                 label={item.label}
                 path={item.path}
+                onClick={() => handleTabClick(item.path)} // Handle tab click
+                sx={{
+                  // Conditional styling for active tab
+                  backgroundColor: activeTab === item.path ? '#d6dbe08d' : 'transparent',
+                  '&:hover': {
+                    backgroundColor: activeTab === item.path ? '#116dca8d' : '#b46464', // Hover effect for active tab
+                  },
+                }}
               />
             ))}
         </List>
@@ -105,6 +116,12 @@ export default function Sidebar() {
                 label={item.label}
                 path={item.path}
                 onClick={item.label === "Logout" ? handleLogout : null} // Attach logout handler to logout item
+                sx={{
+                  backgroundColor: activeTab === item.path ? '#d6dbe08d' : 'transparent',
+                  '&:hover': {
+                    backgroundColor: activeTab === item.path ? '#d6dbe08d' : '#f1f1f1', // Hover effect for active tab
+                  },
+                }}
               />
             ))}
         </List>
