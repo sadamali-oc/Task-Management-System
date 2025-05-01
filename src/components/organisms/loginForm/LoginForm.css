@@ -1,0 +1,31 @@
+.login-title {
+    text-align: center;
+    color: #1976d2;
+    font-family: sans-serif;
+    margin-bottom: 20px;
+}
+
+
+.forgot-password {
+    font-size: 14px;
+    text-align: right;
+    font-family: sans-serif;
+    margin-bottom: 10px;
+
+
+}
+
+.error-text {
+    color: red;
+    text-align: center;
+    font-size: 14px;
+
+
+}
+
+.footer-text {
+    text-align: center;
+    font-family: sans-serif;
+    margin-top: 10px;
+    font-size: 14px;
+}
