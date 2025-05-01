@@ -1,14 +1,18 @@
 import React from "react";
-import { ListItem, ListItemButton, ListItemText } from "@mui/material";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import IconLabelButton from "../../atoms/iconLabelButton";
 
-export default function NavigationItem({ icon, label, path, onClick }) {
+const NavigationItem = ({ icon, label, path, onClick, sx }) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (onClick) onClick(); 
+    if (path && path !== "#") navigate(path);
+  };
+
   return (
-    <ListItem disablePadding>
-      <ListItemButton component={Link} to={path} onClick={onClick}>
-        {icon}
-        <ListItemText primary={label} />
-      </ListItemButton>
-    </ListItem>
+    <IconLabelButton icon={icon} label={label} onClick={handleClick} sx={sx} />
   );
-}
+};
+
+export default NavigationItem;
