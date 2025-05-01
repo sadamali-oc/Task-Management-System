@@ -8,6 +8,7 @@ import ListAltIcon from "@mui/icons-material/ListAlt";
 import TaskIcon from "@mui/icons-material/Task";
 import RemoveCircleOutline from "@mui/icons-material/RemoveCircleOutline";
 import ListIcon from '@mui/icons-material/List';
+import LogoutIcon from "@mui/icons-material/Logout";
 
 const drawerWidth = 240;
 
@@ -53,7 +54,7 @@ const logoutItem = [
   },
   {
     label: "Logout",
-    icon: <RemoveCircleOutline />,
+    icon: <LogoutIcon/>,
     path: "#",
     roles: ["admin", "developer", "client"],
   },
