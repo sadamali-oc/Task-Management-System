@@ -36,12 +36,11 @@ const CreateTaskForm = () => {
 
   return (
     <div>
-      <Title text="Create a Task" />
 
       <BasicCard
         sx={{
           padding: "20px",
-          width: "400px",
+          width: "900px",
           margin: "auto",
           marginBottom: "20px",
         }}

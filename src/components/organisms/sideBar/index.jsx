@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Drawer, Toolbar, Box, Divider } from "@mui/material";
-import SidebarSection from "../sidebarSection"
+import SidebarSection from "../sidebarSection";
 
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AssignmentIcon from "@mui/icons-material/Assignment";
@@ -13,20 +13,56 @@ import LogoutIcon from "@mui/icons-material/Logout";
 const drawerWidth = 240;
 
 const navItems = [
-  { label: "Dashboard", icon: <DashboardIcon />, path: "/", roles: ["admin", "developer", "client"] },
-  { label: "Manage Users", icon: <PeopleIcon />, path: "/admin/users", roles: ["admin"] },
-  { label: "Create Task", icon: <TaskIcon />, path: "/create-task", roles: ["client"] },
-  { label: "View Tasks", icon: <ListIcon />, path: "/tasks", roles: ["admin", "client"] },
-  { label: "Assigned Tasks", icon: <ListAltIcon />, path: "/assign", roles: ["admin", "developer"] },
+  {
+    label: "Dashboard",
+    icon: <DashboardIcon />,
+    path: "/dashboard",
+    roles: ["admin", "developer", "client"],
+  },
+  {
+    label: "Manage Users",
+    icon: <PeopleIcon />,
+    path: "/admin/users",
+    roles: ["admin"],
+  },
+  {
+    label: "Create Task",
+    icon: <TaskIcon />,
+    path: "create-task",
+    roles: ["client"],
+  },
+  {
+    label: "View Tasks",
+    icon: <ListIcon />,
+    path: "tasks",
+    roles: ["admin", "client"],
+  },
+  {
+    label: "Assigned Tasks",
+    icon: <ListAltIcon />,
+    path: "assign",
+    roles: ["admin", "developer"],
+  },
 ];
 
 const logoutItems = [
-  { label: "Profile", icon: <AssignmentIcon />, path: "/profile", roles: ["admin", "developer", "client"] },
-  { label: "Logout", icon: <LogoutIcon />, path: "#", roles: ["admin", "developer", "client"] },
+  {
+    label: "Profile",
+    icon: <AssignmentIcon />,
+    path: "/profile",
+    roles: ["admin", "developer", "client"],
+  },
+  {
+    label: "Logout",
+    icon: <LogoutIcon />,
+    path: "#",
+    roles: ["admin", "developer", "client"],
+  },
 ];
 
 export default function Sidebar() {
   const [activeTab, setActiveTab] = useState("/");
+  //role
   const role = "developer";
 
   return (
