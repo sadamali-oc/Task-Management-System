@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Drawer, Toolbar, Box, Divider } from "@mui/material";
 import SidebarSection from "../sidebarSection";
-import DashboardIcon from "@mui/icons-material/Dashboard";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import PeopleIcon from "@mui/icons-material/People";
 import ListAltIcon from "@mui/icons-material/ListAlt";
@@ -10,26 +9,17 @@ import ListIcon from "@mui/icons-material/List";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import UseAuthStore from "../../../store/UseAuthStore"; 
+import { useNavigate } from "react-router-dom";
 
 const drawerWidth = 240;
 
 const navItems = [
-  // {
-  //   label: "Dashboard",
-  //   icon: <DashboardIcon />,
-  //   path: "/dashboard",
-  //   roles: ["admin", "developer", "client"],
-  // },
-  {
-    label: "Manage Users",
-    icon: <PeopleIcon />,
-    path: "/admin/users",
-    roles: ["admin"],
-  },
+ 
+  
   {
     label: "Create Task",
     icon: <TaskIcon />,
-    path: "create-task",
+    path: "client/create-task",
     roles: ["client"],
   },
   {
@@ -52,26 +42,63 @@ const navItems = [
     roles: ["admin"],
   },
 
+  {
+    label: "Create Users",
+    icon: <PeopleIcon />,
+    path: "signup",
+    roles: ["admin"],
+  },
+
 ];
 
 const logoutItems = [
-  {
-    label: "Profile",
-    icon: <AssignmentIcon />,
-    path: "/profile",
-    roles: ["admin"],
-  },
+  // {
+  //   label: "Profile",
+  //   icon: <AssignmentIcon />,
+  //   path: "/profile",
+  //   roles: ["admin"],
+  // },
   {
     label: "Logout",
     icon: <LogoutIcon />,
-    path: "auth/login",
+    path: "",
     roles: ["admin", "developer", "client"],
   },
 ];
 
 export default function Sidebar() {
+
+
   const [activeTab, setActiveTab] = useState("/");
-  const role = UseAuthStore((state) => state.user?.role);  
+
+  const role = UseAuthStore((state) => state.user?.role); 
+  const navigate = useNavigate(); 
+
+  useEffect(() => {
+    if (role === "client") {
+      setActiveTab("client/create-task"); 
+      navigate("client/create-task"); 
+
+    }
+
+
+    if (role === "developer") {
+      setActiveTab("assign"); 
+      navigate("assign"); 
+
+    }
+
+
+    if (role === "admin") {
+      setActiveTab("developer"); 
+      navigate("developer"); 
+
+    }
+
+
+
+
+  }, [role]);
 
   const filteredNavItems = navItems.filter(item => item.roles.includes(role));
 

@@ -1,11 +1,15 @@
 import React from 'react';
 import PasswordResetForm  from "../../components/organisms/passwordResetForm"
+import AuthTemplate from '../../components/templates/authTemplate';
 
 const PasswordResetPage = () => {
   return (
-    <div>
-      <PasswordResetForm  />
-    </div>
+    <>
+    <AuthTemplate>
+    <PasswordResetForm  />
+    </AuthTemplate>
+     
+    </>
   );
 };
 

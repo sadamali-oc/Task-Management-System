@@ -1,8 +1,7 @@
 import React from "react";
-import { Box, Container } from "@mui/material";
-import LoginForm from "../../organisms/loginForm";
+import {  Container } from "@mui/material";
 
-const LoginTemplate = () => {
+const AuthTemplate = ({children}) => {
   return (
     <Container
       maxWidth="sm" 
@@ -14,9 +13,9 @@ const LoginTemplate = () => {
         mt: 0,
       }}
     >
-      <LoginForm />
+      {children}
     </Container>
   );
 };
 
-export default LoginTemplate;
+export default AuthTemplate;

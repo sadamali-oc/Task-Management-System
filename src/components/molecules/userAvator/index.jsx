@@ -9,7 +9,12 @@ import clientImage from "../../../assets/clientImage.jpg";
 const UserBox = styled(Box)({
   display: "flex",
   alignItems: "center",
-  gap: "20px",
+  gap: "10px",
+  backgroundColor:"#a7a7b335",
+  borderRadius:"20px",
+  width:"200px"
+ 
+  
 });
 
 const roleImages = {
@@ -23,7 +28,6 @@ const UserAvator = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulating a loading state, you can replace this with actual async fetching logic
     setTimeout(() => {
       setLoading(false);
     }, 1000);
@@ -44,8 +48,8 @@ const UserAvator = () => {
     <UserBox>
       <Avatar alt={name || "User"} src={image} />
       <Box>
-        <Typography variant="body2">{name || "Loading..."}</Typography>
-        <Typography variant="caption">{email || "Loading..."}</Typography>
+        <Typography variant="body2"  sx={{ fontWeight: "bold" }}>{name}</Typography>
+        <Typography variant="caption">{email}</Typography>
       </Box>
     </UserBox>
   );

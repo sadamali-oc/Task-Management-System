@@ -1,87 +1,104 @@
 import React, { useState } from "react";
-import BasicCard from "../../atoms/basicCard";
+import { Box, Paper, Alert, Stack } from "@mui/material";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import useTaskStore from "../../../store/useTaskStore";
 import FormField from "../../molecules/formField";
 import CategorySelector from "../../molecules/categorySelector";
 import BasicButton from "../../atoms/basicButton";
-import { Box, Paper } from "@mui/material";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import useTaskStore from "../../../store/useTaskStore"; // Import Zustand store
 
 const CreateTaskForm = () => {
+
   const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [subcategory, setSubcategory] = useState("");
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState({
+
+
     taskNameError: "",
     categoryError: "",
     subcategoryError: "",
+
   });
 
-  // Access addTask from Zustand store
+
+
   const addTask = useTaskStore((state) => state.addTask);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Reset error states
     setError({ taskNameError: "", categoryError: "", subcategoryError: "" });
+    setSuccess(false);
 
     let hasError = false;
 
-    // Validate fields
     if (taskName.trim() === "") {
-      setError((prev) => ({ ...prev, taskNameError: "Task name is required." }));
+      setError((prev) => ({
+        ...prev,
+        taskNameError: "Task name is required.",
+      }));
       hasError = true;
     }
 
     if (!category) {
-      setError((prev) => ({ ...prev, categoryError: "Please select a category." }));
+      setError((prev) => ({
+        ...prev,
+        categoryError: "Please select a category.",
+      }));
       hasError = true;
     }
 
     if (!subcategory) {
-      setError((prev) => ({ ...prev, subcategoryError: "Please select a subcategory." }));
+      setError((prev) => ({
+        ...prev,
+        subcategoryError: "Please select a subcategory.",
+      }));
       hasError = true;
     }
 
     if (hasError) return;
 
     const taskData = {
-      id: `task-${new Date().getTime()}`, // Unique ID based on timestamp
+      id: `task-${Date.now()}`,
       taskName,
       description,
       category,
       subcategory,
-      status: "unread", // Default status
+      status: "pending", 
     };
 
-    // Use addTask from Zustand store to add the task
     addTask(taskData);
 
     setTaskName("");
     setDescription("");
     setCategory("");
     setSubcategory("");
+    setSuccess(true);
   };
 
   return (
     <div>
-      <Paper sx={{ padding: "10px", marginTop: "2px" }}>
+      <Paper sx={{ padding: 2, marginTop: 2 }}>
         <form onSubmit={handleSubmit}>
+          {success && (
+            <Stack sx={{ mb: 2 }}>
+              <Alert severity="success">Task created successfully!</Alert>
+            </Stack>
+          )}
+
           <FormField
             label="Task Name*"
             value={taskName}
             onChange={(e) => setTaskName(e.target.value)}
             error={!!error.taskNameError}
-            helperText={error.taskNameError} // Conditionally show error message here
+            helperText={error.taskNameError}
           />
           <FormField
             label="Task Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             multiline
-            error={false}
           />
           <CategorySelector
             category={category}

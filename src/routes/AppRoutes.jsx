@@ -16,14 +16,15 @@ const AppRoutes = () => {
       {/* login page */}
       <Route path="" element={<LoginPage />} />
 
-      <Route path="/auth/signup" element={<SignUpPage />} />
+     
 
       <Route path="/forgot-password" element={<PasswordResetPage />} />
 
 
       <Route path="/dashboard" element={<MainDashboardTemplate />}>
-        <Route path="create-task" element={<CreateTaskPage />} />
+        <Route path="client/create-task" element={<CreateTaskPage />} />
         <Route path="tasks" element={<ClientTaskTable />} />
+        <Route path="signup" element={<SignUpPage />} />
         <Route path="assign" element={<DeveloperDashboardPage />} />
         <Route path="developer" element={<AdminDashboardPage/>} />
       </Route>
