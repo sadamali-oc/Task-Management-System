@@ -43,7 +43,7 @@ const PasswordResetForm = () => {
     console.log("Resetting password for email:", email);
 
     setTimeout(() => {
-      navigate("/auth/login");
+      navigate("login");
     }, 2000);
   };
 

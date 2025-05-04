@@ -3,22 +3,32 @@ import { Routes, Route } from "react-router-dom";
 import LoginPage from "../pages/loginPage";
 import SignUpPage from "../pages/signUpPage";
 import PasswordResetPage from "../pages/passwordResetPage";
-import CreateTaskPage from "../pages/createtaskPage";
-import ClientTaskTable from "../components/molecules/ClientTaskTable";
+import CreateTaskPage from "../pages/createTaskPage";
+import ClientTaskTable from "../components/molecules/clientTaskTable";
 import MainDashboardTemplate from "../components/templates/mainDashboardTemplate";
 import DeveloperDashboardPage from "../pages/developerDashboardPage";
+import AdminDashboardPage from "../pages/adminDashboardPage";
 
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/auth/login" element={<LoginPage />} />
+
+      {/* login page */}
+      <Route path=""element={<LoginPage />} />
+
       <Route path="/auth/signup" element={<SignUpPage />} />
-      <Route path="/auth/forgot-password" element={<PasswordResetPage />} />
+
+      <Route path="/forgot-password" element={<PasswordResetPage />} />
+
+
       <Route path="/dashboard" element={<MainDashboardTemplate />}>
         <Route path="create-task" element={<CreateTaskPage />} />
         <Route path="tasks" element={<ClientTaskTable />} />
-        <Route path="assign" element={<DeveloperDashboardPage/>} />
+        <Route path="assign" element={<DeveloperDashboardPage />} />
+        <Route path="developer" element={<AdminDashboardPage/>} />
       </Route>
+
+      
     </Routes>
   );
 };

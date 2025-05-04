@@ -1,16 +1,22 @@
-import React from 'react'
+import React from "react";
 import { Box, Container } from "@mui/material";
-import LoginForm from "../../organisms/loginForm"
-
+import LoginForm from "../../organisms/loginForm";
 
 const LoginTemplate = () => {
   return (
-    <Container maxWidth="sm">
-    <Box sx={{ mt: 8 }}>
+    <Container
+      maxWidth="sm" 
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh", 
+        mt: 0,
+      }}
+    >
       <LoginForm />
-    </Box>
-  </Container>
-  )
-}
+    </Container>
+  );
+};
 
-export default LoginTemplate
+export default LoginTemplate;

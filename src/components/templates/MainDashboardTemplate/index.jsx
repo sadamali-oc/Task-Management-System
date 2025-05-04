@@ -7,7 +7,7 @@ import UserAvator from "../../molecules/userAvator";
 export default function MainDashboardTemplate() {
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex",  padding:"10px"}}>
       <CssBaseline />
 
       <AppBar
@@ -30,8 +30,13 @@ export default function MainDashboardTemplate() {
         </Toolbar>
       </AppBar>
       <Sidebar />
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+
+      <Box component="main" sx={{ flexGrow: 1, p: 0 }}>
+
+
         <Toolbar />
+
+
         <Outlet />
       </Box>
     </Box>

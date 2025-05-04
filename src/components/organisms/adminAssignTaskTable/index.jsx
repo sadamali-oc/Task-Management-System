@@ -7,28 +7,26 @@ import {
   TableRow,
   Select,
   MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
-import AddCommentIcon from '@mui/icons-material/AddComment';
-import CommentBox from "../../molecules/commentBox";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 
-const DeveloperTaskTable = ({ tasks = [], onStatusChange }) => {
-  const [openCommentBox, setOpenCommentBox] = useState(false);
+// Dummy Data for Developers
+const developers = [
+  { id: 1, name: "John Doe" },
+  { id: 2, name: "Jane Smith" },
+  { id: 3, name: "David Brown" },
+];
+
+const AdminAssignTaskTable = ({ tasks = [], onStatusChange, onAssignTask }) => {
+  const [selectedDeveloper, setSelectedDeveloper] = useState({});
   const [selectedTaskId, setSelectedTaskId] = useState(null);
-  const [comment, setComment] = useState("");
 
-  const handleCommentClick = (taskId) => {
+  const handleDeveloperChange = (taskId, developerId) => {
     setSelectedTaskId(taskId);
-    setOpenCommentBox(true);
-  };
-
-  const handleCloseCommentBox = () => {
-    setOpenCommentBox(false);
-    setSelectedTaskId(null);
-  };
-
-  const handleSaveComment = () => {
-    console.log(`Saved comment for Task ID ${selectedTaskId}:`, comment);
-    handleCloseCommentBox();
+    setSelectedDeveloper(developerId);
+    onAssignTask(taskId, developerId); // Assuming this function assigns the developer to the task.
   };
 
   return (
@@ -38,9 +36,9 @@ const DeveloperTaskTable = ({ tasks = [], onStatusChange }) => {
           <TableRow sx={{ bgcolor: "#d6dbe08d" }}>
             <TableCell align="center">Task Name</TableCell>
             <TableCell align="center">Description</TableCell>
-            <TableCell align="center">Category</TableCell> {/* Added Category Column */}
-            <TableCell align="center">Subcategory</TableCell> {/* Added Subcategory Column */}
-            <TableCell align="center">Comment</TableCell>
+            <TableCell align="center">Category</TableCell>
+            <TableCell align="center">Subcategory</TableCell>
+            <TableCell align="center">Assigned Developer</TableCell>
             <TableCell align="center">Status</TableCell>
           </TableRow>
         </TableHead>
@@ -49,14 +47,29 @@ const DeveloperTaskTable = ({ tasks = [], onStatusChange }) => {
             <TableRow key={index}>
               <TableCell align="center">{task.taskName}</TableCell>
               <TableCell>{task.description}</TableCell>
-              <TableCell align="center">{task.category}</TableCell> {/* Display Category */}
-              <TableCell align="center">{task.subcategory}</TableCell> {/* Display Subcategory */}
+              <TableCell align="center">{task.category}</TableCell>
+              <TableCell align="center">{task.subcategory}</TableCell>
+
+              {/* Assign Developer Dropdown */}
               <TableCell align="center">
-                <AddCommentIcon
-                  sx={{ cursor: "pointer", color: "#121213b5" }}
-                  onClick={() => handleCommentClick(task.id)}
-                />
+                <FormControl fullWidth>
+                  <Select
+                    value={task.developer || ""}
+                    onChange={(e) => handleDeveloperChange(task.id, e.target.value)}
+                    displayEmpty
+                    sx={{ minWidth: "150px" }}
+                  >
+                    <MenuItem value="">None</MenuItem>
+                    {developers.map((developer) => (
+                      <MenuItem key={developer.id} value={developer.id}>
+                        {developer.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </TableCell>
+
+              {/* Task Status Dropdown */}
               <TableCell align="center">
                 <Select
                   value={task.status}
@@ -106,17 +119,8 @@ const DeveloperTaskTable = ({ tasks = [], onStatusChange }) => {
           ))}
         </TableBody>
       </Table>
-
-      {/* Comment Box Pop-up */}
-      <CommentBox
-        open={openCommentBox}
-        onClose={handleCloseCommentBox}
-        onSave={handleSaveComment}
-        comment={comment}
-        setComment={setComment}
-      />
     </>
   );
 };
 
-export default DeveloperTaskTable;
+export default AdminAssignTaskTable;

@@ -1,84 +1,106 @@
 import React, { useState } from "react";
 import BasicCard from "../../atoms/basicCard";
-import InputText from "../../atoms/inputText";
+import FormField from "../../molecules/formField";
+import CategorySelector from "../../molecules/categorySelector";
 import BasicButton from "../../atoms/basicButton";
-import InputAdornment from "@mui/material/InputAdornment";
-import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
-import Title from "../../atoms/title";
-import TaskTable from "../../molecules/ClientTaskTable";
+import { Box, Paper } from "@mui/material";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import useTaskStore from "../../../store/useTaskStore"; // Import Zustand store
 
 const CreateTaskForm = () => {
   const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
-  const [tasks, setTasks] = useState([]);
-  const [error, setError] = useState("");
+  const [category, setCategory] = useState("");
+  const [subcategory, setSubcategory] = useState("");
+  const [error, setError] = useState({
+    taskNameError: "",
+    categoryError: "",
+    subcategoryError: "",
+  });
+
+  // Access addTask from Zustand store
+  const addTask = useTaskStore((state) => state.addTask);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // Reset error states
+    setError({ taskNameError: "", categoryError: "", subcategoryError: "" });
+
+    let hasError = false;
+
+    // Validate fields
     if (taskName.trim() === "") {
-      setError("Task name is required.");
-      return;
+      setError((prev) => ({ ...prev, taskNameError: "Task name is required." }));
+      hasError = true;
     }
 
+    if (!category) {
+      setError((prev) => ({ ...prev, categoryError: "Please select a category." }));
+      hasError = true;
+    }
+
+    if (!subcategory) {
+      setError((prev) => ({ ...prev, subcategoryError: "Please select a subcategory." }));
+      hasError = true;
+    }
+
+    if (hasError) return;
+
     const taskData = {
-      id: Date.now(),
+      id: `task-${new Date().getTime()}`, // Unique ID based on timestamp
       taskName,
       description,
-      status: "unread",
+      category,
+      subcategory,
+      status: "unread", // Default status
     };
 
-    setTasks([taskData, ...tasks]);
+    // Use addTask from Zustand store to add the task
+    addTask(taskData);
+
     setTaskName("");
     setDescription("");
-    setError("");
+    setCategory("");
+    setSubcategory("");
   };
 
   return (
     <div>
-
-      <BasicCard
-        sx={{
-          padding: "20px",
-          width: "900px",
-          margin: "auto",
-          marginBottom: "20px",
-        }}
-      >
+      <Paper sx={{ padding: "10px", marginTop: "2px" }}>
         <form onSubmit={handleSubmit}>
-          {error && (
-            <p style={{ color: "red", marginBottom: "10px" }}>{error}</p>
-          )}
+          <FormField
+            label="Task Name*"
+            value={taskName}
+            onChange={(e) => setTaskName(e.target.value)}
+            error={!!error.taskNameError}
+            helperText={error.taskNameError} // Conditionally show error message here
+          />
+          <FormField
+            label="Task Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            multiline
+            error={false}
+          />
+          <CategorySelector
+            category={category}
+            setCategory={setCategory}
+            subcategory={subcategory}
+            setSubcategory={setSubcategory}
+            categoryError={error.categoryError}
+            subcategoryError={error.subcategoryError}
+          />
 
-          <div style={{ marginBottom: "16px" }}>
-            <InputText
-              label="Task Name"
-              value={taskName}
-              onChange={(e) => setTaskName(e.target.value)}
-              inputSlotProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <DriveFileRenameOutlineIcon />
-                  </InputAdornment>
-                ),
-              }}
+          <Box display="flex" justifyContent="flex-end" mt={2}>
+            <BasicButton
+              label="Create Task"
+              type="submit"
+              startIcon={<AddCircleIcon />}
             />
-          </div>
-
-          <div style={{ marginBottom: "16px" }}>
-            <InputText
-              label="Task Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              multiline={true}
-            />
-          </div>
-
-          <BasicButton label="Create Task" type="submit" />
+          </Box>
         </form>
-      </BasicCard>
-
-   
+      </Paper>
     </div>
   );
 };

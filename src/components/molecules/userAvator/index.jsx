@@ -1,7 +1,10 @@
-import React from "react";
-import { Avatar, Box, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Avatar, Box, Typography, CircularProgress } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import profileImage from "../../../assets/profileImage.jpg";
+import UseAuthStore from "../../../store/UseAuthStore";
+import adminProfile from "../../../assets/adminProfile.jpg";
+import developerImage from "../../../assets/developerImage.jpg";
+import clientImage from "../../../assets/clientImage.jpg";
 
 const UserBox = styled(Box)({
   display: "flex",
@@ -9,23 +12,42 @@ const UserBox = styled(Box)({
   gap: "20px",
 });
 
-const UserAvator = ({
-  name = "Chamalka Obadage",
-  email = "chamalka@gmail.com",
-  image = profileImage,
-}) => {
+const roleImages = {
+  admin: adminProfile,
+  developer: developerImage,
+  client: clientImage,
+};
+
+const UserAvator = () => {
+  const user = UseAuthStore((state) => state.user);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulating a loading state, you can replace this with actual async fetching logic
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, []);
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  const { name, email, role } = user || {};
+  const image = roleImages[role] || adminProfile;
+
   return (
-    <div>
-      <UserBox>
-        <Avatar alt={name} src={image} />
-        <Box>
-          <Typography variant="body2">{name}</Typography>
-          <Typography variant="caption" color="text.secondary">
-            {email}
-          </Typography>
-        </Box>
-      </UserBox>
-    </div>
+    <UserBox>
+      <Avatar alt={name || "User"} src={image} />
+      <Box>
+        <Typography variant="body2">{name || "Loading..."}</Typography>
+        <Typography variant="caption">{email || "Loading..."}</Typography>
+      </Box>
+    </UserBox>
   );
 };
 

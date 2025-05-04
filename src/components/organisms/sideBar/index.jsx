@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Drawer, Toolbar, Box, Divider } from "@mui/material";
 import SidebarSection from "../sidebarSection";
-
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import PeopleIcon from "@mui/icons-material/People";
@@ -9,16 +8,18 @@ import ListAltIcon from "@mui/icons-material/ListAlt";
 import TaskIcon from "@mui/icons-material/Task";
 import ListIcon from "@mui/icons-material/List";
 import LogoutIcon from "@mui/icons-material/Logout";
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import UseAuthStore from "../../../store/UseAuthStore"; 
 
 const drawerWidth = 240;
 
 const navItems = [
-  {
-    label: "Dashboard",
-    icon: <DashboardIcon />,
-    path: "/dashboard",
-    roles: ["admin", "developer", "client"],
-  },
+  // {
+  //   label: "Dashboard",
+  //   icon: <DashboardIcon />,
+  //   path: "/dashboard",
+  //   roles: ["admin", "developer", "client"],
+  // },
   {
     label: "Manage Users",
     icon: <PeopleIcon />,
@@ -35,14 +36,22 @@ const navItems = [
     label: "View Tasks",
     icon: <ListIcon />,
     path: "tasks",
-    roles: ["admin", "client"],
+    roles: ["client"],
   },
   {
     label: "Assigned Tasks",
     icon: <ListAltIcon />,
     path: "assign",
-    roles: ["admin", "developer"],
+    roles: ["developer"],
   },
+
+  {
+    label: "Assigned Developers",
+    icon: <AssignmentIndIcon />,
+    path: "developer",
+    roles: ["admin"],
+  },
+
 ];
 
 const logoutItems = [
@@ -50,20 +59,21 @@ const logoutItems = [
     label: "Profile",
     icon: <AssignmentIcon />,
     path: "/profile",
-    roles: ["admin", "developer", "client"],
+    roles: ["admin"],
   },
   {
     label: "Logout",
     icon: <LogoutIcon />,
-    path: "#",
+    path: "auth/login",
     roles: ["admin", "developer", "client"],
   },
 ];
 
 export default function Sidebar() {
   const [activeTab, setActiveTab] = useState("/");
-  //role
-  const role = "developer";
+  const role = UseAuthStore((state) => state.user?.role);  
+
+  const filteredNavItems = navItems.filter(item => item.roles.includes(role));
 
   return (
     <Drawer
@@ -76,8 +86,9 @@ export default function Sidebar() {
     >
       <Toolbar />
       <Box sx={{ overflow: "auto" }}>
+       
         <SidebarSection
-          items={navItems}
+          items={filteredNavItems}
           role={role}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
