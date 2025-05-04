@@ -14,7 +14,7 @@ const AppRoutes = () => {
     <Routes>
 
       {/* login page */}
-      <Route path=""element={<LoginPage />} />
+      <Route path="" element={<LoginPage />} />
 
       <Route path="/auth/signup" element={<SignUpPage />} />
 
@@ -28,7 +28,7 @@ const AppRoutes = () => {
         <Route path="developer" element={<AdminDashboardPage/>} />
       </Route>
 
-      
+
     </Routes>
   );
 };

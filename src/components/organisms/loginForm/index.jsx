@@ -38,8 +38,9 @@ const LoginForm = () => {
       setError("Please fill in both fields.");
       return;
     }
+    
 
-  //hard coded user credentials
+  //Hardcoded users for login 
 
     const users = {
       admin: {
@@ -64,23 +65,31 @@ const LoginForm = () => {
       },
     };
 
-    
+
 
     let matchedUser = null;
 
     if (email === users.admin.email && password === users.admin.password) {
       matchedUser = users.admin;
-    } else if (
+    } 
+    
+    else if (
       email === users.developer.email &&
       password === users.developer.password
-    ) {
+    ) 
+    {
       matchedUser = users.developer;
-    } else if (
+    } 
+    
+    else if (
       email === users.client.email &&
       password === users.client.password
     ) {
       matchedUser = users.client;
     }
+
+    console.log("Match user: " , matchedUser)
+
 
     if (matchedUser) {
       setError("");
@@ -96,6 +105,8 @@ const LoginForm = () => {
       setShowSuccessAlert(false);
     }
   };
+
+
 
   return (
     <div>
