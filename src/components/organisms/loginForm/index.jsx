@@ -11,41 +11,36 @@ import "./LoginForm.css";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 
-
 const LoginForm = () => {
-
   const navigate = useNavigate();
   const loginUser = UseAuthStore((state) => state.loginUser);
 
-  //email,pwd, alert  states
+  //email,pwd,alert  states
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
-
-  const handleEmailChange = (e)=>{
+  const handleEmailChange = (e) => {
     setEmail(e.target.value);
-  }
+  };
 
-  const handlePasswordChange = (e) =>{
-     setPassword(e.target.value);
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
 
-  }
-
-  //  form submit handler function
+  //form submit handler function
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
 
     if (!email || !password) {
       setError("Please fill in both fields.");
       return;
     }
 
+  //hard coded user credentials
 
-//hard coded user credentials
     const users = {
       admin: {
         email: "admin@example.com",
@@ -53,19 +48,23 @@ const LoginForm = () => {
         password: "admin123",
         role: "admin",
       },
+
       developer: {
         email: "dev@example.com",
         name: "Nisal Karunarathne",
         password: "dev123",
         role: "developer",
       },
+
       client: {
         email: "client@example.com",
         name: "Kamal Nishantha",
-        password: "client123",
+        password:"client123",
         role: "client",
       },
     };
+
+    
 
     let matchedUser = null;
 
@@ -97,8 +96,6 @@ const LoginForm = () => {
       setShowSuccessAlert(false);
     }
   };
-
-  
 
   return (
     <div>
