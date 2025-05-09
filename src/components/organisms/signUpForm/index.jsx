@@ -1,37 +1,72 @@
 import React, { useState } from "react";
-import { Box, TextField, Typography, Link as MuiLink, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import { useNavigate, Link as RouterLink } from "react-router-dom";
+import {
+  Box,
+  TextField,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Alert,
+  Stack,
+} from "@mui/material";
 import BasicCard from "../../atoms/basicCard";
 import EmailInputField from "../../molecules/emailInputField";
 import PasswordInputField from "../../molecules/passwordInputField";
 import BasicButton from "../../atoms/basicButton";
 import Title from "../../atoms/title";
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import CodeIcon from '@mui/icons-material/Code';
-import PersonIcon from '@mui/icons-material/Person';
-import "./SignUpForm.css";
+import api from "../../../api/api";
+import useAuthStore from "../../../store/useAuthStore";
 
 const SignUpForm = () => {
-  const navigate = useNavigate();
-
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState("client");  // Default to client
+  const [role, setRole] = useState("client");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const handleNameChange = (e) => setName(e.target.value);
-  const handleEmailChange = (e) => setEmail(e.target.value);
-  const handlePasswordChange = (e) => setPassword(e.target.value);
-  const handleConfirmPasswordChange = (e) => setConfirmPassword(e.target.value);
-  const handleRoleChange = (e) => setRole(e.target.value);
+  const { token, role: userRole } = useAuthStore();
 
-  const handleSubmit = (e) => {
+  const isDisabled = userRole !== "admin";
+
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+    setSuccess("");
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+    setSuccess("");
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    setSuccess("");
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    setConfirmPassword(e.target.value);
+    setSuccess("");
+  };
+
+  const handleRoleChange = (e) => {
+    setRole(e.target.value);
+    setSuccess("");
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name || !email || !password || !confirmPassword) {
+    if (!username || !email || !password || !confirmPassword) {
       setError("Please fill in all fields.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address.");
       return;
     }
 
@@ -40,40 +75,67 @@ const SignUpForm = () => {
       return;
     }
 
-    const newUser = { name, email, password, role };  // Include role here
+    const newUser = { username, email, password, role };
 
-    // Example: Saving to localStorage (In production, this should be sent to backend)
-    localStorage.setItem("user", JSON.stringify(newUser));
+    try {
+      if (userRole !== "admin") {
+        setError("You do not have permission to create a profile.");
+        return;
+      }
 
-    setError("");
-    console.log("User registered:", newUser);
+      await api.post("/admin/create_user", newUser, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    // Navigate to the login page after successful registration
-    navigate("/auth/login");
+      setError("");
+      setSuccess("Account created successfully!");
+      setUsername("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      console.error("Error creating user:", err.response?.data || err.message);
+      setError("Failed to create user. You may not have permission.");
+    }
   };
 
   return (
     <div>
       <BasicCard sx={{ height: "auto", width: "400px", padding: "20px", boxShadow: 3 }}>
-        <Title text="Create a Account" />
+        <Title text="Create an Account" />
 
         <form onSubmit={handleSubmit}>
+          {success && (
+            <Stack sx={{ width: "100%", mb: 2 }} spacing={2}>
+              <Alert severity="success">{success}</Alert>
+            </Stack>
+          )}
+
+          {error && (
+            <Stack sx={{ width: "100%", mb: 2 }} spacing={2}>
+              <Alert severity="error">{error}</Alert>
+            </Stack>
+          )}
+
           <Box sx={{ mb: 2 }}>
             <TextField
-              label="Full Name"
+              label="Username"
               variant="outlined"
               fullWidth
-              value={name}
-              onChange={handleNameChange}
+              value={username}
+              onChange={handleUsernameChange}
+              disabled={isDisabled}
             />
           </Box>
 
           <Box sx={{ mb: 2 }}>
-            <EmailInputField value={email} onChange={handleEmailChange} />
+            <EmailInputField value={email} onChange={handleEmailChange} disabled={isDisabled} />
           </Box>
 
           <Box sx={{ mb: 2 }}>
-            <PasswordInputField value={password} onChange={handlePasswordChange} />
+            <PasswordInputField value={password} onChange={handlePasswordChange} disabled={isDisabled} />
           </Box>
 
           <Box sx={{ mb: 2 }}>
@@ -81,43 +143,27 @@ const SignUpForm = () => {
               label="Confirm Password"
               value={confirmPassword}
               onChange={handleConfirmPasswordChange}
+              disabled={isDisabled}
             />
           </Box>
 
           <Box sx={{ mb: 2 }}>
-            <FormControl fullWidth>
+            <FormControl fullWidth disabled={isDisabled}>
               <InputLabel>Role</InputLabel>
               <Select value={role} onChange={handleRoleChange} label="Role">
-              
-                <MenuItem value="developer">
-                  <CodeIcon sx={{ mr: 1 }} /> Developer
-                </MenuItem>
-                <MenuItem value="client">
-                  <PersonIcon sx={{ mr: 1 }} /> Client
-                </MenuItem>
+                <MenuItem value="developer">Developer</MenuItem>
+                <MenuItem value="client">Client</MenuItem>
               </Select>
             </FormControl>
           </Box>
-
-          {error && (
-            <Typography variant="body2" color="error" sx={{ mb: 2 }}>
-              {error}
-            </Typography>
-          )}
 
           <Box sx={{ mb: 2 }}>
             <BasicButton
               type="submit"
               sx={{ minHeight: "50px", minWidth: "100%" }}
               label="Save"
+              disabled={isDisabled}
             />
-          </Box>
-
-          <Box className="footer-text" sx={{ textAlign: "center" }}>
-            <span>Already have an account? </span>
-            <MuiLink component={RouterLink} to="/auth/login" underline="hover" color="primary">
-              Sign in here
-            </MuiLink>
           </Box>
         </form>
       </BasicCard>

@@ -12,29 +12,53 @@ import {
   InputLabel,
   TableContainer,
   Paper,
+  Typography,
+  Tooltip,
+  Button,
 } from "@mui/material";
 import AddCommentIcon from "@mui/icons-material/AddComment";
 import CommentBox from "../../molecules/commentBox";
+import useTaskStore from "../../../store/useTaskStore"; // Zustand store
 
 const DeveloperTaskTable = ({ tasks = [], onStatusChange }) => {
   const [openCommentBox, setOpenCommentBox] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [selectedCommentId, setSelectedCommentId] = useState(null);
   const [comment, setComment] = useState("");
+  const [isReply, setIsReply] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const handleCommentClick = (taskId) => {
+  const { updateTaskComment, addReply } = useTaskStore();
+
+  const handleCommentClick = (taskId, commentId = null) => {
     setSelectedTaskId(taskId);
+    setSelectedCommentId(commentId);
+    setIsReply(commentId !== null);
     setOpenCommentBox(true);
   };
 
   const handleCloseCommentBox = () => {
     setOpenCommentBox(false);
     setSelectedTaskId(null);
+    setSelectedCommentId(null);
+    setIsReply(false);
+    setComment("");
   };
 
   const handleSaveComment = () => {
-    console.log(`Saved comment for Task ID ${selectedTaskId}:`, comment);
+    if (!comment.trim()) return; // prevent empty submissions
+
+    if (isReply && selectedCommentId !== null) {
+      addReply(selectedTaskId, selectedCommentId, comment); // Save the reply
+    } else {
+      updateTaskComment(selectedTaskId, comment); // Save the main comment
+    }
+
     handleCloseCommentBox();
+  };
+
+  const handleStatusChange = (taskId, newStatus) => {
+    onStatusChange(taskId, newStatus);
   };
 
   const filteredTasks = tasks.filter(
@@ -85,11 +109,15 @@ const DeveloperTaskTable = ({ tasks = [], onStatusChange }) => {
             label="Status"
             onChange={(e) => setStatusFilter(e.target.value)}
           >
-            {uniqueStatuses.map((status) => (
-              <MenuItem key={status} value={status}>
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </MenuItem>
-            ))}
+            {uniqueStatuses.map((status) => {
+              // Check if the status is valid before calling charAt
+              if (!status) return null;
+              return (
+                <MenuItem key={status} value={status}>
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </MenuItem>
+              );
+            })}
           </Select>
         </FormControl>
       </Box>
@@ -135,17 +163,22 @@ const DeveloperTaskTable = ({ tasks = [], onStatusChange }) => {
                     <TableCell align="center">{task.category}</TableCell>
                     <TableCell align="center">{task.subcategory}</TableCell>
                     <TableCell align="center">
-                      <AddCommentIcon
-                        titleAccess="Add comment"
-                        sx={{ cursor: "pointer", color: "#121213b5" }}
-                        onClick={() => handleCommentClick(task.id)}
-                      />
+                      <Tooltip title="Add Comment">
+                        <AddCommentIcon
+                          sx={{ cursor: "pointer", color: "#121213b5" }}
+                          onClick={() => handleCommentClick(task.id)}
+                        />
+                      </Tooltip>
+                      {task.comments?.length > 0 && (
+                        <Typography variant="caption" display="block" mt={0.5}>
+                          {task.comments.length} comment{task.comments.length > 1 ? "s" : ""}
+                        </Typography>
+                      )}
                     </TableCell>
                     <TableCell align="center">
                       <Select
-                        value={task.status}
-                        onChange={(e) => onStatusChange(task.id, e.target.value)}
-                        disabled={task.status === "completed"}
+                        value={task.status || "unknown"}  // Default to 'unknown' if task.status is undefined
+                        onChange={(e) => handleStatusChange(task.id, e.target.value)}
                         displayEmpty
                         sx={{
                           minWidth: "100px",
@@ -166,7 +199,6 @@ const DeveloperTaskTable = ({ tasks = [], onStatusChange }) => {
                             textTransform: "capitalize",
                           },
                         }}
-                        title={task.status === "completed" ? "Task already completed" : ""}
                       >
                         <MenuItem value="pending">Pending</MenuItem>
                         <MenuItem value="processing">Processing</MenuItem>
@@ -181,7 +213,7 @@ const DeveloperTaskTable = ({ tasks = [], onStatusChange }) => {
         </Table>
       </TableContainer>
 
-      {/* Comment Box Pop-up */}
+      {/* Comment Box Modal */}
       <CommentBox
         open={openCommentBox}
         onClose={handleCloseCommentBox}

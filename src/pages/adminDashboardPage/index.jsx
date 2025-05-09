@@ -1,83 +1,45 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import AdminAssignTaskTable from "../../components/organisms/adminAssignTaskTable";
+import useTaskStore from "../../store/useTaskStore";
+import useAuthStore from "../../store/useAuthStore";
 
-const tasksData = [
-  {
-    id: 1,
-    taskName: "Build Login Page",
-    description:
-      "Implement the user login page using React, including form validation, input handling, and UI responsiveness.",
-    category: "Frontend",
-    subcategory: "React",
-    status: "processing",
-  },
-  {
-    id: 2,
-    taskName: "Fix Payment Bug",
-    description:
-      "Investigate and fix the payment gateway timeout issue occurring during transaction processing.",
-    category: "Backend",
-    subcategory: "Node.js",
-    status: "completed",
-  },
-  {
-    id: 3,
-    taskName: "Prepare API Docs",
-    description:
-      "Write API usage documentation, including setup instructions, authentication methods, endpoint descriptions, and example requests.",
-    category: "Documentation",
-    subcategory: "API",
-    status: "pending",
-  },
-  {
-    id: 4,
-    taskName: "User Authentication",
-    description:
-      "Set up user authentication with JWT in the backend, ensuring secure login and session management.",
-    category: "Backend",
-    subcategory: "Node.js",
-    status: "processing",
-  },
-  {
-    id: 5,
-    taskName: "Create Dashboard UI",
-    description:
-      "Develop the dashboard UI in React, integrating with backend data and displaying user statistics.",
-    category: "Frontend",
-    subcategory: "React",
-    status: "pending",
-  },
-  {
-    id: 6,
-    taskName: "Optimize Database Queries",
-    description:
-      "Analyze and optimize slow database queries, ensuring better performance under load.",
-    category: "Backend",
-    subcategory: "Database Optimization",
-    status: "completed",
-  },
-];
 const AdminDashboardPage = () => {
-  const [tasks, setTasks] = useState(tasksData);
+  const tasks = useTaskStore((state) => state.tasks);
+  const developers = useTaskStore((state) => state.developers); // Assuming developers are stored in the state
+  const assignDeveloper = useTaskStore((state) => state.assignDeveloper);
+  const updateStatus = useTaskStore((state) => state.updateStatus);
+  const loggedInUser = useAuthStore((state) => state.loggedInUser); // Get logged-in user
+
+  useEffect(() => {
+    if (loggedInUser && loggedInUser.role === "developer") {
+      // If the logged-in user is a developer, you can add them to the developers list
+      useTaskStore.getState().setDevelopers((prevDevelopers) => {
+        // Add the logged-in user to the developers list only if they are not already in the list
+        if (!prevDevelopers.some((dev) => dev.id === loggedInUser.id)) {
+          return [...prevDevelopers, loggedInUser];
+        }
+        return prevDevelopers;
+      });
+    }
+  }, [loggedInUser]);
 
   const handleAssignTask = (taskId, developerId) => {
-    setTasks(tasks.map((task) =>
-      task.id === taskId ? { ...task, developer: developerId } : task
-    ));
+    console.log("Assigning Developer: Task ID:", taskId, "Developer ID:", developerId);
+    assignDeveloper(taskId, developerId);
   };
 
-  const handleStatusChange = (taskIndex, newStatus) => {
-    const updatedTasks = [...tasks];
-    updatedTasks[taskIndex].status = newStatus;
-    setTasks(updatedTasks);
+  const handleStatusChange = (taskId, newStatus) => {
+    console.log("Changing Status: Task ID:", taskId, "New Status:", newStatus);
+    updateStatus(taskId, newStatus);
   };
 
   return (
     <div>
       <AdminAssignTaskTable
         tasks={tasks}
-        onStatusChange={handleStatusChange}
+        developers={developers}
         onAssignTask={handleAssignTask}
+        onStatusChange={handleStatusChange}
       />
     </div>
   );

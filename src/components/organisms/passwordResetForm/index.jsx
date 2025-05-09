@@ -1,56 +1,74 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import BasicCard from "../../atoms/basicCard";
 import BasicButton from "../../atoms/basicButton";
 import PasswordInputField from "../../molecules/passwordInputField";
 import Title from "../../atoms/title";
-import "./PasswordResetForm.css";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
+import EmailInputField from "../../molecules/emailInputField";
+import useAuthStore from "../../../store/useAuthStore";
 
 const PasswordResetForm = () => {
   const navigate = useNavigate();
 
+  const [email, setEmail] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
-  const handleCurrentPasswordChange = (e) => setCurrentPassword(e.target.value);
-  const handleNewPasswordChange = (e) => setNewPassword(e.target.value);
-  const handleConfirmPasswordChange = (e) => setConfirmPassword(e.target.value);
+  const {
+    resetPassword,
+    resetPasswordMessage,
+    resetPasswordError,
+    clearMessages,
+    email: storedEmail,
+  } = useAuthStore();
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    // Pre-fill email with storedEmail
+    if (storedEmail) {
+      setEmail(storedEmail);
+    }
+  }, [storedEmail]);
+
+  useEffect(() => {
+    if (resetPasswordMessage) {
+      const timeout = setTimeout(() => {
+        clearMessages();
+        navigate("/");
+      }, 3000);
+      return () => clearTimeout(timeout);
+    }
+  }, [resetPasswordMessage, navigate, clearMessages]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    clearMessages();
 
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      setError("Please fill in all fields.");
-      setSuccessMessage("");
+    if (!email || !currentPassword || !newPassword || !confirmPassword) {
+      useAuthStore.setState({ resetPasswordError: "Please fill in all fields." });
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match.");
-      setSuccessMessage("");
+      useAuthStore.setState({ resetPasswordError: "Passwords do not match." });
       return;
     }
 
-    setError("");
-    setSuccessMessage("Password has been successfully reset.");
+    if (email !== storedEmail) {
+      useAuthStore.setState({ resetPasswordError: "Email does not match logged-in user." });
+      return;
+    }
 
-    setTimeout(() => {
-      navigate("/");
-    }, 3000);
+    await resetPassword(email, currentPassword, newPassword, confirmPassword);
   };
 
   return (
     <div>
-      <BasicCard
-        sx={{ height: "auto", width: "400px", padding: "10px", boxShadow: 3 }}
-      >
-        <Title text="Forgot Password" />
+      <BasicCard sx={{ height: "auto", width: "400px", padding: "10px", boxShadow: 3 }}>
+        <Title text="Reset Password" />
 
         <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
           <img
@@ -60,20 +78,27 @@ const PasswordResetForm = () => {
           />
         </Box>
 
-        {/* Alerts for error and success messages */}
-        {(error || successMessage) && (
+        {(resetPasswordError || resetPasswordMessage) && (
           <Stack sx={{ width: "100%", mb: 2 }} spacing={2}>
-            {error && <Alert severity="error">{error}</Alert>}
-            {successMessage && <Alert severity="success">{successMessage}</Alert>}
+            {resetPasswordError && <Alert severity="error">{resetPasswordError}</Alert>}
+            {resetPasswordMessage && <Alert severity="success">{resetPasswordMessage}</Alert>}
           </Stack>
         )}
 
         <form onSubmit={handleSubmit}>
           <Box sx={{ mb: 2 }}>
+            <EmailInputField
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+            />
+          </Box>
+
+          <Box sx={{ mb: 2 }}>
             <PasswordInputField
               label="Current Password"
               value={currentPassword}
-              onChange={handleCurrentPasswordChange}
+              onChange={(e) => setCurrentPassword(e.target.value)}
             />
           </Box>
 
@@ -81,7 +106,7 @@ const PasswordResetForm = () => {
             <PasswordInputField
               label="New Password"
               value={newPassword}
-              onChange={handleNewPasswordChange}
+              onChange={(e) => setNewPassword(e.target.value)}
             />
           </Box>
 
@@ -89,7 +114,7 @@ const PasswordResetForm = () => {
             <PasswordInputField
               label="Confirm New Password"
               value={confirmPassword}
-              onChange={handleConfirmPasswordChange}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </Box>
 

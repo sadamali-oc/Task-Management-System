@@ -6,121 +6,77 @@ import BasicButton from "../../atoms/basicButton";
 import { Box, Link as MuiLink } from "@mui/material";
 import Title from "../../atoms/title";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
-import UseAuthStore from "../../../store/UseAuthStore";
+import useAuthStore from "../../../store/useAuthStore";
 import "./LoginForm.css";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
+import useTaskStore from "../../../store/useTaskStore";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const loginUser = UseAuthStore((state) => state.loginUser);
-
-  //email,pwd,alert  states
+  const loginUser = useAuthStore((state) => state.loginUser);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Loading state for button
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
-
-  //form submit handler function
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); // Clear previous errors
 
+    // Email and Password Validation
     if (!email || !password) {
       setError("Please fill in both fields.");
       return;
     }
-    
 
-  //Hardcoded users for login 
-
-    const users = {
-      admin: {
-        email: "admin@example.com",
-        name: "Peshala Ishari",
-        password: "admin123",
-        role: "admin",
-      },
-
-      developer: {
-        email: "dev@example.com",
-        name: "Nisal Karunarathne",
-        password: "dev123",
-        role: "developer",
-      },
-
-      client: {
-        email: "client@example.com",
-        name: "Kamal Nishantha",
-        password:"client123",
-        role: "client",
-      },
-    };
-
-
-
-    let matchedUser = null;
-
-    if (email === users.admin.email && password === users.admin.password) {
-      matchedUser = users.admin;
-    } 
-    
-    else if (
-      email === users.developer.email &&
-      password === users.developer.password
-    ) 
-    {
-      matchedUser = users.developer;
-    } 
-    
-    else if (
-      email === users.client.email &&
-      password === users.client.password
-    ) {
-      matchedUser = users.client;
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setError("Please enter a valid email address.");
+      return;
     }
 
-    console.log("Match user: " , matchedUser)
+    setIsLoading(true); // Set loading to true during the login process
 
+    try {
+      await loginUser(email, password); // Call loginUser function
+      const user = useAuthStore.getState().user;
 
-    if (matchedUser) {
-      setError("");
-      loginUser(matchedUser);
+      // Log the user details and token (useful for debugging)
+      console.log("User Logged In:", user);
+      console.log("Role:", user?.role);
+      console.log("Email:", user?.email); // Assuming email is part of the user object
+      console.log("Access Token:", user?.access_token);
+
+      // Store developer list if role matches
+      if (user?.role === "developer") {
+        useTaskStore.setState({
+          developers: [user],
+        });
+      }
+
+      // Show success alert and clear after a delay
       setShowSuccessAlert(true);
-
       setTimeout(() => {
         setShowSuccessAlert(false);
-        navigate("/dashboard");
-      }, 3500);
-    } else {
+        navigate("/dashboard"); // Redirect after successful login
+      }); // Adjust the timeout duration (e.g., 2 seconds)
+    } catch (err) {
       setError("Invalid email or password.");
       setShowSuccessAlert(false);
+      console.error("Login error:", err); // Log error details
+    } finally {
+      setIsLoading(false); // Reset loading state after the process
     }
   };
 
-
-
   return (
     <div>
-      <BasicCard
-        sx={{ height: "auto", width: "400px", padding: "20px", boxShadow: 3 }}
-      >
+      <BasicCard sx={{ height: "auto", width: "400px", padding: "20px", boxShadow: 3 }}>
         <Title text="Sign In" />
 
         <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
-          <img
-            src="src/assets/login.png"
-            alt="Login"
-            style={{ width: "200px", height: "auto" }}
-          />
+          <img src="src/assets/login.png" alt="Login" style={{ width: "200px", height: "auto" }} />
         </Box>
 
         {showSuccessAlert && (
@@ -137,22 +93,18 @@ const LoginForm = () => {
 
         <form onSubmit={handleSubmit} autoComplete="off">
           <Box sx={{ mb: 2 }}>
-            <EmailInputField
-              value={email}
-              onChange={handleEmailChange}
-              placeholder="Enter your email"
-            />
+            <EmailInputField value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email" />
           </Box>
           <Box sx={{ mb: 1 }}>
             <PasswordInputField
               value={password}
-              onChange={handlePasswordChange}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               autoComplete="off"
             />
           </Box>
           <Box className="forgot-password" sx={{ textAlign: "right", mb: 2 }}>
-            <MuiLink href="forgot-password" underline="hover">
+            <MuiLink component={RouterLink} to="/forgot-password" underline="hover">
               Forgot Password?
             </MuiLink>
           </Box>
@@ -160,25 +112,10 @@ const LoginForm = () => {
           <Box sx={{ mb: 2 }}>
             <BasicButton
               type="submit"
-              sx={{
-                minHeight: "50px",
-                minWidth: "100%",
-                textTransform: "none",
-              }}
-              label="Sign In"
+              sx={{ minHeight: "50px", minWidth: "100%", textTransform: "none" }}
+              label={isLoading ? "Signing In..." : "Sign In"}
+              disabled={isLoading} 
             />
-          </Box>
-
-          <Box className="footer-text" sx={{ textAlign: "center" }}>
-            <span>Don't have an account? </span>
-            <MuiLink
-              component={RouterLink}
-              to="/auth/signup"
-              underline="hover"
-              color="primary"
-            >
-              Sign up here
-            </MuiLink>
           </Box>
         </form>
       </BasicCard>

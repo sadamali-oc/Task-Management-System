@@ -1,20 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { Drawer, Toolbar, Box, Divider } from "@mui/material";
 import SidebarSection from "../sidebarSection";
-import AssignmentIcon from "@mui/icons-material/Assignment";
 import PeopleIcon from "@mui/icons-material/People";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import TaskIcon from "@mui/icons-material/Task";
 import ListIcon from "@mui/icons-material/List";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import UseAuthStore from "../../../store/UseAuthStore"; 
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "../../../store/useAuthStore";
+
 
 const drawerWidth = 240;
 
 const navItems = [
  
+
+  {
+    label: "View Tasks",
+    icon: <ListIcon />,
+    path: "tasks",
+    roles: ["client"],
+  },
   
   {
     label: "Create Task",
@@ -22,12 +29,7 @@ const navItems = [
     path: "client/create-task",
     roles: ["client"],
   },
-  {
-    label: "View Tasks",
-    icon: <ListIcon />,
-    path: "tasks",
-    roles: ["client"],
-  },
+
   {
     label: "Assigned Tasks",
     icon: <ListAltIcon />,
@@ -61,7 +63,7 @@ const logoutItems = [
   {
     label: "Logout",
     icon: <LogoutIcon />,
-    path: "",
+    path: "/",
     roles: ["admin", "developer", "client"],
   },
 ];
@@ -71,13 +73,13 @@ export default function Sidebar() {
 
   const [activeTab, setActiveTab] = useState("/");
 
-  const role = UseAuthStore((state) => state.user?.role); 
+  const role = useAuthStore((state) => state.user?.role); 
   const navigate = useNavigate(); 
 
   useEffect(() => {
     if (role === "client") {
-      setActiveTab("client/create-task"); 
-      navigate("client/create-task"); 
+      setActiveTab("tasks"); 
+      navigate("tasks"); 
 
     }
 
